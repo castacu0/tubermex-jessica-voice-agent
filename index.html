@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TuberMex · Jessica · Agent Control Panel</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2430; --line:#2a3240;
+    --ink:#e6edf3; --muted:#9aa7b4; --accent:#3b82f6; --accent2:#22d3ee;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171; --pink:#f472b6;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,#1b2a4a 0%,transparent 60%),var(--bg);
+    color:var(--ink);min-height:100vh}
+  a{color:var(--accent2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{padding:26px 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;
+    justify-content:space-between;gap:20px;flex-wrap:wrap;background:rgba(13,17,23,.7);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#22d3ee);
+    display:grid;place-items:center;font-size:24px;box-shadow:0 6px 20px rgba(34,211,238,.25)}
+  .brand h1{font-size:18px;margin:0;letter-spacing:.2px}
+  .brand p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+  .pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
+    background:rgba(52,211,153,.12);color:var(--green);font-size:12.5px;font-weight:600;border:1px solid rgba(52,211,153,.25)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+  .btn{padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+  .btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .btn.primary{background:linear-gradient(135deg,#3b82f6,#22d3ee);border:none;color:#06121f}
+  nav{display:flex;gap:6px;padding:14px 32px 0;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+  .tab{padding:11px 18px;border-radius:10px 10px 0 0;cursor:pointer;color:var(--muted);font-size:13.5px;
+    font-weight:600;border:1px solid transparent;border-bottom:none}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--ink);background:var(--panel);border-color:var(--line)}
+  main{padding:28px 32px;max-width:1180px;margin:0 auto}
+  .view{display:none;animation:fade .25s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:880px){.g2,.g3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .card h3{margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+  .card .big{font-size:22px;font-weight:700;margin:6px 0 2px}
+  .kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .kv:last-child{border-bottom:none}
+  .kv span:first-child{color:var(--muted)}
+  .kv b{font-weight:600}
+  .sectiontitle{font-size:15px;font-weight:700;margin:26px 0 12px;display:flex;align-items:center;gap:9px}
+  .sectiontitle .bar{width:4px;height:18px;border-radius:3px;background:linear-gradient(var(--accent),var(--accent2))}
+  /* config sliders */
+  .slider-row{margin:14px 0}
+  .slider-row label{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:7px}
+  .slider-row label b{color:var(--accent2)}
+  input[type=range]{width:100%;accent-color:var(--accent2)}
+  .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  .chip{display:inline-block;padding:5px 11px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);
+    font-size:12.5px;margin:4px 6px 0 0}
+  /* flow */
+  .flow{counter-reset:step;display:grid;gap:12px}
+  .step{display:flex;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;position:relative}
+  .step .num{flex:0 0 34px;height:34px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);
+    display:grid;place-items:center;font-weight:700;color:var(--accent2)}
+  .step h4{margin:0 0 5px;font-size:14.5px}
+  .step p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5}
+  .step .tag{position:absolute;top:14px;right:14px;font-size:11px;padding:3px 9px;border-radius:999px}
+  .tag.ask{background:rgba(59,130,246,.15);color:#93c5fd}
+  .tag.gate{background:rgba(251,191,36,.15);color:var(--amber)}
+  .tag.emo{background:rgba(248,113,113,.15);color:var(--red)}
+  /* pricing table */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+  td.price{color:var(--green);font-weight:600;white-space:nowrap}
+  /* simulator */
+  .sim{display:grid;grid-template-columns:1fr;gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel)}
+  .sim-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;background:var(--panel2)}
+  .sim-head .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#f472b6,#fbbf24);display:grid;place-items:center;font-size:18px}
+  .sim-head .meta b{font-size:14px}
+  .sim-head .meta span{display:block;color:var(--muted);font-size:12px}
+  .langtoggle{margin-left:auto;display:flex;gap:6px}
+  .langtoggle button{padding:6px 13px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer;font-size:12.5px;font-weight:600}
+  .langtoggle button.on{background:var(--accent);color:#06121f;border-color:transparent}
+  .chatbody{padding:18px;height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:78%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.5;animation:fade .25s}
+  .msg.bot{background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px;align-self:flex-start}
+  .msg.user{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+  .msg small{display:block;opacity:.6;font-size:10.5px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+  .quick{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;background:var(--panel2)}
+  .quick button{padding:8px 13px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;font-size:12.5px;transition:.15s}
+  .quick button:hover{border-color:var(--accent2)}
+  .quick button:disabled{opacity:.35;cursor:default}
+  .progress{height:5px;background:var(--panel2)}
+  .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
+  .footer{padding:26px 32px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);text-align:center}
+  .note{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:10px;padding:12px 14px;font-size:13px;color:#bcd5f5;margin-top:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">🔧</div>
+    <div>
+      <h1>TuberMex Plomería · Jessica</h1>
+      <p>Bilingual voice agent control panel · Mexico City</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="pill"><span class="dot"></span>Live 100%</span>
+    <a class="btn primary" href="https://elevenlabs.io/app/talk-to/agent_8801ktq4ba78ezebznsgbmk3j6sp" target="_blank">Talk to Jessica ↗</a>
+  </div>
+</header>
+
+<nav id="nav">
+  <div class="tab active" data-v="overview">Overview</div>
+  <div class="tab" data-v="config">Configuration</div>
+  <div class="tab" data-v="flow">Conversation Flow</div>
+  <div class="tab" data-v="data">Services &amp; Pricing</div>
+  <div class="tab" data-v="sim">Try Jessica</div>
+  <div class="tab" data-v="deploy">Deploy &amp; Options</div>
+</nav>
+
+<main>
+  <!-- OVERVIEW -->
+  <section class="view active" id="overview">
+    <div class="grid g3">
+      <div class="card"><h3>Agent</h3><div class="big">Jessica</div><div class="hint">Bilingual phone intake agent</div></div>
+      <div class="card"><h3>Status</h3><div class="big" style="color:var(--green)">Published · Live</div><div class="hint">Public access enabled</div></div>
+      <div class="card"><h3>Voice</h3><div class="big">Jessica</div><div class="hint">Playful, Bright, Warm · American accent</div></div>
+    </div>
+    <div class="sectiontitle"><span class="bar"></span>Agent identity</div>
+    <div class="grid g2">
+      <div class="card">
+        <div class="kv"><span>Agent ID</span><b style="font-family:monospace;font-size:12px">agent_8801ktq4ba78ezebznsgbmk3j6sp</b></div>
+        <div class="kv"><span>Company</span><b>TuberMex Plomería</b></div>
+        <div class="kv"><span>Location</span><b>Mexico City (CDMX)</b></div>
+        <div class="kv"><span>Timezone</span><b>America/Mexico_City</b></div>
+        <div class="kv"><span>Languages</span><b>English (default) + Spanish</b></div>
+        <div class="kv"><span>LLM</span><b>Claude Haiku 4.5</b></div>
+      </div>
+      <div class="card">
+        <h3>First message</h3>
+        <p style="font-size:14px;line-height:1.6;color:var(--ink)">"Thanks for calling TuberMex Plomería! Do you prefer English or Spanish? ¡Gracias por llamar a TuberMex Plomería! ¿Prefiere inglés o español?"</p>
+        <div class="note">Greeting is bilingual on pickup, then Jessica locks to whichever language the caller chooses.</div>
+      </div>
+    </div>
+    <div class="sectiontitle"><span class="bar"></span>What this agent does</div>
+    <div class="grid g3">
+      <div class="card"><h3>Intake</h3><p style="font-size:13.5px;color:var(--muted)">Captures name, colonia, problem, and urgency through a guided 6-step flow.</p></div>
+      <div class="card"><h3>Triage</h3><p style="font-size:13.5px;color:var(--muted)">Detects emergencies (flooding, burst pipe, gas) and skips straight to dispatch.</p></div>
+      <div class="card"><h3>Handoff</h3><p style="font-size:13.5px;color:var(--muted)">Only after 5+ questions, offers to schedule or transfer to a human plumber.</p></div>
+    </div>
+  </section>
+
+  <!-- CONFIG -->
+  <section class="view" id="config">
+    <div class="sectiontitle"><span class="bar"></span>Live configuration (mirrors ElevenLabs)</div>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Voice tuning</h3>
+        <div class="slider-row">
+          <label>Stability <b id="vStab">0.50</b></label>
+          <input type="range" min="0" max="1" step="0.05" value="0.5" oninput="vStab.textContent=(+this.value).toFixed(2)">
+          <div class="hint">Lower = more expressive. Higher = more consistent across calls.</div>
+        </div>
+        <div class="slider-row">
+          <label>Similarity boost <b id="vSim">0.75</b></label>
+          <input type="range" min="0" max="1" step="0.05" value="0.75" oninput="vSim.textContent=(+this.value).toFixed(2)">
+          <div class="hint">How closely output sticks to Jessica's original timbre.</div>
+        </div>
+        <div class="slider-row">
+          <label>LLM temperature <b id="vTemp">0.60</b></label>
+          <input type="range" min="0" max="1" step="0.05" value="0.6" oninput="vTemp.textContent=(+this.value).toFixed(2)">
+          <div class="hint">0.4 = sticks to the script · 0.7 = more natural improvisation.</div>
+        </div>
+        <div class="note">These sliders are a visual mirror. To make changes stick, adjust them in the ElevenLabs editor and republish.</div>
+      </div>
+      <div class="card">
+        <h3>Voice &amp; language stack</h3>
+        <div class="kv"><span>Primary voice</span><b>Jessica – Playful, Bright, Warm</b></div>
+        <div class="kv"><span>Voice ID</span><b style="font-family:monospace;font-size:12px">cgSgspJ2msm6clMCkdW9</b></div>
+        <div class="kv"><span>Accent</span><b>American (for expats)</b></div>
+        <div class="kv"><span>Default language</span><b>English</b></div>
+        <div class="kv"><span>Secondary</span><b>Spanish (Mexican)</b></div>
+        <div class="kv"><span>Interruptible</span><b style="color:var(--green)">On</b></div>
+        <h3 style="margin-top:18px">Knowledge surfaced in prompt</h3>
+        <span class="chip">Company facts</span><span class="chip">Hours</span><span class="chip">8 services</span>
+        <span class="chip">7 price points</span><span class="chip">Warranty</span><span class="chip">Payment</span>
+        <span class="chip">Service area (8 colonias)</span><span class="chip">Appointment slots</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOW -->
+  <section class="view" id="flow">
+    <div class="sectiontitle"><span class="bar"></span>Guided intake — minimum 5 questions before transfer</div>
+    <div class="flow">
+      <div class="step"><div class="num">1</div><div><h4>Language preference</h4><p>"Do you prefer English or Spanish? / ¿Prefiere inglés o español?"</p></div><span class="tag ask">ask</span></div>
+      <div class="step"><div class="num">2</div><div><h4>Name</h4><p>"Can I get your name? / ¿Me da su nombre, por favor?"</p></div><span class="tag ask">ask</span></div>
+      <div class="step"><div class="num">3</div><div><h4>Location / colonia</h4><p>"What's the address or neighborhood? In Mexico City, which colonia? / ¿Cuál es su dirección o colonia?"</p></div><span class="tag ask">ask</span></div>
+      <div class="step"><div class="num">4</div><div><h4>Problem description</h4><p>"Tell me what's going on — what are you seeing or hearing? / Cuénteme qué está pasando."</p></div><span class="tag ask">ask</span></div>
+      <div class="step"><div class="num">5</div><div><h4>Clarifying follow-up</h4><p>One specific question based on the answer — e.g. "Is the leak dripping or actively running?"</p></div><span class="tag ask">ask</span></div>
+      <div class="step"><div class="num">6</div><div><h4>Urgency check</h4><p>"Is this an active emergency, or can it wait for a scheduled visit? / ¿Es una emergencia activa?"</p></div><span class="tag gate">gate</span></div>
+      <div class="step"><div class="num">→</div><div><h4>Offer: schedule or transfer to a human</h4><p>Only unlocks after the 6 steps above. "I can schedule a technician, or transfer you to one of our plumbers — which works better?"</p></div><span class="tag gate">gate</span></div>
+    </div>
+    <div class="sectiontitle"><span class="bar"></span>Emergency override</div>
+    <div class="step"><div class="num">!</div><div><h4>Active flooding / burst pipe / sewage</h4><p>Skips the flow, grabs the address immediately, dispatches, then offers transfer.</p></div><span class="tag emo">skip</span></div>
+    <div class="step" style="margin-top:12px"><div class="num">⛽</div><div><h4>Gas smell</h4><p>Redirects to gas provider (Gas Natural Fenosa / Gas LP), tells caller to ventilate, then offers a pipe-connection check afterward.</p></div><span class="tag emo">redirect</span></div>
+  </section>
+
+  <!-- DATA -->
+  <section class="view" id="data">
+    <div class="grid g2">
+      <div class="card">
+        <div class="sectiontitle" style="margin-top:0"><span class="bar"></span>Services</div>
+        <span class="chip">Emergency plumbing</span><span class="chip">Drain cleaning</span>
+        <span class="chip">Water heater install/repair</span><span class="chip">Leak detection</span>
+        <span class="chip">Toilet repair/replace</span><span class="chip">Fixture installation</span>
+        <span class="chip">Sewer line inspection</span><span class="chip">Bath/kitchen rough-in</span>
+        <div class="sectiontitle"><span class="bar"></span>Service area</div>
+        <span class="chip">Benito Juárez</span><span class="chip">Coyoacán</span><span class="chip">Álvaro Obregón</span>
+        <span class="chip">Miguel Hidalgo</span><span class="chip">Cuauhtémoc</span><span class="chip">Tlalpan</span>
+        <span class="chip">Xochimilco</span><span class="chip">Magdalena Contreras</span>
+      </div>
+      <div class="card">
+        <div class="sectiontitle" style="margin-top:0"><span class="bar"></span>Hours</div>
+        <div class="kv"><span>Mon – Fri</span><b>7am – 8pm</b></div>
+        <div class="kv"><span>Saturday</span><b>8am – 5pm</b></div>
+        <div class="kv"><span>Sunday</span><b>Closed · emergencies 24/7</b></div>
+        <div class="kv"><span>After-hours surcharge</span><b>+$200 MXN/hr</b></div>
+        <div class="sectiontitle"><span class="bar"></span>Payment</div>
+        <span class="chip">Cash</span><span class="chip">SPEI</span><span class="chip">Mercado Pago</span>
+        <span class="chip">Visa / MC</span><span class="chip">Kueski Pay (6mo 0%)</span>
+        <div class="sectiontitle"><span class="bar"></span>Warranty</div>
+        <div class="kv"><span>Labor</span><b>30 days</b></div>
+        <div class="kv"><span>Parts</span><b>90 days</b></div>
+      </div>
+    </div>
+    <div class="sectiontitle"><span class="bar"></span>Pricing (demo estimates · MXN)</div>
+    <div class="card">
+      <table>
+        <tr><th>Service</th><th>Estimate</th><th>Notes</th></tr>
+        <tr><td>Diagnostic visit</td><td class="price">$350</td><td>Credited toward service</td></tr>
+        <tr><td>Labor (per hour)</td><td class="price">$400 – $550</td><td>Standard hours</td></tr>
+        <tr><td>After-hours premium</td><td class="price">+$200/hr</td><td>10pm – 7am</td></tr>
+        <tr><td>Drain cleaning</td><td class="price">$600 – $900</td><td>Depends on access</td></tr>
+        <tr><td>Water heater install</td><td class="price">$1,200 – $1,800</td><td>Labor only</td></tr>
+        <tr><td>Leak detection</td><td class="price">$800 – $1,500</td><td>Non-invasive equipment</td></tr>
+        <tr><td>Toilet repair / wax ring</td><td class="price">$350 – $600</td><td>Parts + labor</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- SIM -->
+  <section class="view" id="sim">
+    <div class="sectiontitle"><span class="bar"></span>Live voice — talk to Jessica right now</div>
+    <p class="hint" style="margin-bottom:14px">Real ElevenLabs widget. Click the call button (bottom-right of the page) and speak. Works because the agent is Public.</p>
+    <div class="card" style="margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="font-size:30px">🎙️</div>
+      <div style="flex:1;min-width:220px"><b>Voice test enabled.</b><div class="hint">A floating "Call Jessica" button is mounted on this page via the ElevenLabs embed. If you don't see it, the agent must be set to Public in the Widget tab.</div></div>
+    </div>
+    <elevenlabs-convai agent-id="agent_8801ktq4ba78ezebznsgbmk3j6sp"></elevenlabs-convai>
+    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+
+    <div class="sectiontitle"><span class="bar"></span>Simulated call — click to walk Jessica's flow (no minutes used)</div>
+    <p class="hint" style="margin-bottom:14px">This is a scripted demo of the conversation logic for when you want to show the flow without a live call.</p>
+    <div class="sim">
+      <div class="sim-head">
+        <div class="av">🎧</div>
+        <div class="meta"><b>Jessica</b><span>TuberMex Plomería · intake</span></div>
+        <div class="langtoggle">
+          <button id="enBtn" class="on" onclick="setLang('en')">EN</button>
+          <button id="esBtn" onclick="setLang('es')">ES</button>
+        </div>
+      </div>
+      <div class="progress"><div id="bar"></div></div>
+      <div class="chatbody" id="chat"></div>
+      <div class="quick" id="quick"></div>
+    </div>
+    <button class="btn" style="margin-top:14px" onclick="resetSim()">↺ Restart call</button>
+  </section>
+
+  <!-- DEPLOY -->
+  <section class="view" id="deploy">
+    <div class="sectiontitle"><span class="bar"></span>Deployment channels</div>
+    <div class="grid g3">
+      <div class="card"><h3>Phone (Twilio)</h3><div class="big" style="font-size:18px;color:var(--green)">Connected</div><p class="hint">US number routed through ElevenLabs. Assign under Deploy → Phone Numbers.</p></div>
+      <div class="card"><h3>Web widget</h3><div class="big" style="font-size:18px">Available</div><p class="hint">Embeddable call button for tubermex.com.mx.</p></div>
+      <div class="card"><h3>WhatsApp</h3><div class="big" style="font-size:18px;color:var(--amber)">Optional</div><p class="hint">Can be linked to 55 4321 0987 for chat intake.</p></div>
+    </div>
+    <div class="sectiontitle"><span class="bar"></span>Suggested next options</div>
+    <div class="grid g2">
+      <div class="card"><h3>Real human transfer</h3><p style="font-size:13.5px;color:var(--muted)">Wire a transfer tool to a real plumber number so the handoff actually connects, not just spoken.</p></div>
+      <div class="card"><h3>Data capture</h3><p style="font-size:13.5px;color:var(--muted)">Add a webhook/tool to log name, colonia, problem, and urgency to Airtable or a CRM after each call.</p></div>
+      <div class="card"><h3>Knowledge base</h3><p style="font-size:13.5px;color:var(--muted)">Move pricing into a KB doc so quotes can't drift and the prompt stays lean.</p></div>
+      <div class="card"><h3>Callback number</h3><p style="font-size:13.5px;color:var(--muted)">Add a 6th intake question for a callback number in case the call drops.</p></div>
+    </div>
+  </section>
+</main>
+
+<div class="footer">TuberMex Plomería is a fictive demo brand. All data, pricing, and contact details are illustrative. Agent built on ElevenLabs Agents.</div>
+
+<script>
+  // tabs
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.v).classList.add('active');
+    if(t.dataset.v==='sim' && !started) resetSim();
+  });
+
+  // ---- simulator ----
+  let lang='en', step=0, started=false;
+  const chat=document.getElementById('chat'), quick=document.getElementById('quick'), bar=document.getElementById('bar');
+
+  const S = {
+    en:[
+      {bot:"Thanks for calling TuberMex Plomería! Do you prefer English or Spanish?",
+       opts:[{t:"English, please",next:1}]},
+      {bot:"Great, I'll help you in English. Can I get your name?",
+       opts:[{t:"It's David, I'm an expat in Roma Norte",next:2}]},
+      {bot:"Nice to meet you, David. Which colonia are you in?",
+       opts:[{t:"Roma Norte, Cuauhtémoc",next:3}]},
+      {bot:"Got it, that's in our service area. Tell me what's going on — what are you seeing or hearing?",
+       opts:[{t:"Water heater stopped working",next:4},{t:"There's water all over my kitchen floor!",next:90}]},
+      {bot:"Okay. Is the water heater completely off, or is it on but not heating well?",
+       opts:[{t:"Completely off, no hot water at all",next:5}]},
+      {bot:"Thanks. Is this an active emergency right now, or can it wait for a scheduled visit?",
+       opts:[{t:"It can wait, just need it fixed soon",next:6}]},
+      {bot:"Perfect. For a tankless unit, labor runs about $1,200–$1,800 MXN, plus the $350 diagnostic that gets credited. I can schedule a technician, or transfer you to one of our plumbers directly — which works better?",
+       opts:[{t:"Schedule a technician",next:7},{t:"Transfer me to a plumber",next:8}]},
+      {bot:"I have tomorrow 9–11am or 1–3pm open. I'll book you in and send a confirmation by WhatsApp. Anything else, David?",opts:[{t:"That's all, thanks!",next:99}]},
+      {bot:"I'm going to connect you with one of our plumbers — stay on the line. (Transfer initiated)",opts:[{t:"Start over",next:0}]},
+    ],
+    es:[
+      {bot:"¡Gracias por llamar a TuberMex Plomería! ¿Prefiere inglés o español?",
+       opts:[{t:"Español, por favor",next:1}]},
+      {bot:"Perfecto, con gusto le ayudo. ¿Me da su nombre, por favor?",
+       opts:[{t:"Soy Mariana, de la Del Valle",next:2}]},
+      {bot:"Mucho gusto, Mariana. ¿En qué colonia se encuentra?",
+       opts:[{t:"Del Valle, Benito Juárez",next:3}]},
+      {bot:"Listo, sí cubrimos esa zona. Cuénteme, ¿qué está pasando? ¿Qué está viendo o escuchando?",
+       opts:[{t:"Se tapó el drenaje de la cocina",next:4},{t:"¡Hay una fuga, se está inundando!",next:90}]},
+      {bot:"Entiendo. ¿Hace cuánto está lento el drenaje, solo hoy o ya tiene tiempo?",
+       opts:[{t:"Ya tiene como tres días",next:5}]},
+      {bot:"Gracias. ¿Es una emergencia activa en este momento o puede esperar a una cita programada?",
+       opts:[{t:"Puede esperar, pero pronto",next:6}]},
+      {bot:"Va. Un destape sencillo anda entre $600 y $900 MXN, más los $350 de diagnóstico que se descuentan. Puedo agendar un técnico, o si prefiere hablar directamente con uno de nuestros plomeros, lo transfiero — ¿qué prefiere?",
+       opts:[{t:"Agendar un técnico",next:7},{t:"Transfiéreme con un plomero",next:8}]},
+      {bot:"Tengo mañana de 9 a 11 o de 1 a 3. Se la aparto y le mando confirmación por WhatsApp. ¿Algo más, Mariana?",opts:[{t:"Es todo, ¡gracias!",next:99}]},
+      {bot:"La voy a conectar con uno de nuestros plomeros — un momento. (Transferencia iniciada)",opts:[{t:"Empezar de nuevo",next:0}]},
+    ]
+  };
+  const EMG = {
+    en:{bot:"Okay David, let's not wait — let me get someone headed your way right now. Can you confirm the address in Roma Norte? Also, shut off the main valve if you can reach it.",opts:[{t:"Done, sending someone?",next:8}]},
+    es:{bot:"Va Mariana, no esperemos — ahorita le mandamos a alguien. ¿Me confirma la dirección en Del Valle? Y si puede, cierre la llave de paso general.",opts:[{t:"Listo, ¿ya viene alguien?",next:8}]}
+  };
+  const END = {en:"Thanks for calling TuberMex Plomería, David. Have a great day!",es:"Gracias por llamar a TuberMex Plomería, Mariana. ¡Que tenga buen día!"};
+
+  function setLang(l){lang=l;document.getElementById('enBtn').classList.toggle('on',l==='en');
+    document.getElementById('esBtn').classList.toggle('on',l==='es');resetSim();}
+
+  function add(role,text,labelEN,labelES){
+    const m=document.createElement('div');m.className='msg '+role;
+    const lab=(role==='bot')?'Jessica':(lang==='en'?'Caller':'Cliente');
+    m.innerHTML='<small>'+lab+'</small>'+text;
+    chat.appendChild(m);chat.scrollTop=chat.scrollHeight;
+  }
+  function render(){
+    quick.innerHTML='';
+    let node;
+    if(step===90) node=EMG[lang];
+    else if(step===99){ add('bot',END[lang]); bar.style.width='100%';
+      const b=document.createElement('button');b.textContent=lang==='en'?'↺ New call':'↺ Nueva llamada';b.onclick=()=>{step=0;resetSim();};quick.appendChild(b);return;}
+    else node=S[lang][step];
+    add('bot',node.bot);
+    const total=8;
+    bar.style.width=Math.min(100,(step/total)*100)+'%';
+    node.opts.forEach(o=>{
+      const b=document.createElement('button');b.textContent=o.t;
+      b.onclick=()=>{add('user',o.t);quick.querySelectorAll('button').forEach(x=>x.disabled=true);
+        setTimeout(()=>{step=o.next;render();},480);};
+      quick.appendChild(b);
+    });
+  }
+  function resetSim(){started=true;step=0;chat.innerHTML='';bar.style.width='0';render();}
+  resetSim();
+</script>
+</body>
+</html>
