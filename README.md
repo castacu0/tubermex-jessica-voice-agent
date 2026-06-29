@@ -11,7 +11,7 @@
 
 **A demo voice agent that answers the phone, runs a guided intake, triages emergencies, and offers a human handoff.**
 
-[🎙️ Talk to Jessica](https://elevenlabs.io/app/talk-to/agent_8801ktq4ba78ezebznsgbmk3j6sp) · [🌐 Live demo page](https://castacu0.com/hidden-testing-live-demos/) · [📊 Open the dashboard](./index.html)
+[🎙️ Talk to Jessica](https://elevenlabs.io/app/talk-to?agent_id=agent_8801ktq4ba78ezebznsgbmk3j6sp) · [🌐 Live demo page](https://castacu0.com/hidden-testing-live-demos/) · [📊 Open the dashboard](https://castacu0.github.io/tubermex-jessica-voice-agent/)
 
 </div>
 
