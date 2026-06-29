@@ -100,6 +100,17 @@
   .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
   .footer{padding:26px 32px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);text-align:center}
   .note{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:10px;padding:12px 14px;font-size:13px;color:#bcd5f5;margin-top:14px}
+  /* light theme */
+  body.light{
+    --bg:#ffffff; --panel:#f6f8fa; --panel2:#eef1f5; --line:#d6dde6;
+    --ink:#1b2430; --muted:#5a6675; --accent:#2563eb; --accent2:#0e7490;
+    background:radial-gradient(1200px 600px at 80% -10%,#dbeafe 0%,transparent 60%),#ffffff;
+  }
+  body.light header{background:rgba(255,255,255,.85)}
+  body.light .note{background:rgba(37,99,235,.07);border-color:rgba(37,99,235,.25);color:#1e40af}
+  body.light .tag.ask{background:rgba(37,99,235,.12);color:#1d4ed8}
+  body.light .msg.bot{color:var(--ink)}
+  body.light .btn.primary{color:#ffffff}
 </style>
 </head>
 <body>
@@ -111,7 +122,9 @@
       <p>Bilingual voice agent control panel · Mexico City</p>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px">
+  <div id="hdrControls" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <button id="thBtn" class="btn" onclick="toggleTheme()">☀️ Light</button>
+    <button id="xlBtn" class="btn" onclick="setPageLang(pageLang==='es'?'en':'es')">🌐 Español</button>
     <span class="pill"><span class="dot"></span>Live 100%</span>
     <a class="btn primary" href="https://elevenlabs.io/app/talk-to?agent_id=agent_8801ktq4ba78ezebznsgbmk3j6sp" target="_blank">Talk to Jessica ↗</a>
   </div>
@@ -260,7 +273,7 @@
   <!-- SIM -->
   <section class="view" id="sim">
     <div class="sectiontitle"><span class="bar"></span>Live voice — talk to Jessica right now</div>
-    <p class="hint" style="margin-bottom:14px">Real ElevenLabs widget. Click the call button (bottom-right of the page) and speak. Works because the agent is Public.</p>
+    <p class="hint" style="margin-bottom:14px">Click the button below to open the ElevenLabs voice page and talk to Jessica live, in English or Spanish.</p>
     <div class="card" style="margin-bottom:24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
       <div style="font-size:34px">🎙️</div>
       <div style="flex:1;min-width:220px"><b>Call Jessica for real.</b><div class="hint">Opens the ElevenLabs voice page, allow the mic, and talk in English or Spanish. Works on any device.</div></div>
@@ -391,6 +404,124 @@
   }
   function resetSim(){started=true;step=0;chat.innerHTML='';bar.style.width='0';render();}
   resetSim();
+
+  // ---- light / dark theme ----
+  function toggleTheme(){
+    document.body.classList.toggle('light');
+    var lt=document.body.classList.contains('light');
+    document.getElementById('thBtn').textContent = lt ? '🌙 Dark' : '☀️ Light';
+  }
+
+  // ---- page translation (EN <-> ES) ----
+  var pageLang='en';
+  var origText=new Map();
+  var I18N={
+    "Bilingual voice agent control panel · Mexico City":"Panel de control del agente de voz bilingüe · Ciudad de México",
+    "Live 100%":"En vivo 100%",
+    "Talk to Jessica ↗":"Hablar con Jessica ↗",
+    "Overview":"Resumen","Configuration":"Configuración","Conversation Flow":"Flujo de conversación",
+    "Services & Pricing":"Servicios y precios","Try Jessica":"Prueba a Jessica","Deploy & Options":"Despliegue y opciones",
+    "Agent":"Agente","Bilingual phone intake agent":"Agente telefónico bilingüe de recepción",
+    "Status":"Estado","Published · Live":"Publicado · En vivo","Public access enabled":"Acceso público habilitado",
+    "Voice":"Voz","Playful, Bright, Warm · American accent":"Alegre, brillante y cálida · acento americano",
+    "Agent identity":"Identidad del agente","Agent ID":"ID del agente","Company":"Empresa","Location":"Ubicación",
+    "Mexico City (CDMX)":"Ciudad de México (CDMX)","Timezone":"Zona horaria","Languages":"Idiomas",
+    "English (default) + Spanish":"Inglés (predeterminado) + Español","First message":"Primer mensaje",
+    "Greeting is bilingual on pickup, then Jessica locks to whichever language the caller chooses.":"El saludo es bilingüe al contestar; luego Jessica se queda en el idioma que elija el cliente.",
+    "What this agent does":"Qué hace este agente","Intake":"Recepción",
+    "Captures name, colonia, problem, and urgency through a guided 6-step flow.":"Captura nombre, colonia, problema y urgencia con un flujo guiado de 6 pasos.",
+    "Triage":"Clasificación",
+    "Detects emergencies (flooding, burst pipe, gas) and skips straight to dispatch.":"Detecta emergencias (inundación, tubería rota, gas) y pasa directo al despacho.",
+    "Handoff":"Transferencia",
+    "Only after 5+ questions, offers to schedule or transfer to a human plumber.":"Solo después de 5+ preguntas, ofrece agendar o transferir con un plomero humano.",
+    "Live configuration (mirrors ElevenLabs)":"Configuración en vivo (refleja ElevenLabs)",
+    "Voice tuning":"Ajuste de voz","Stability":"Estabilidad",
+    "Lower = more expressive. Higher = more consistent across calls.":"Más bajo = más expresiva. Más alto = más consistente entre llamadas.",
+    "Similarity boost":"Refuerzo de similitud",
+    "How closely output sticks to Jessica's original timbre.":"Qué tanto se apega la salida al timbre original de Jessica.",
+    "LLM temperature":"Temperatura del LLM",
+    "0.4 = sticks to the script · 0.7 = more natural improvisation.":"0.4 = sigue el guion · 0.7 = improvisación más natural.",
+    "These sliders are a visual mirror. To make changes stick, adjust them in the ElevenLabs editor and republish.":"Estos controles son un reflejo visual. Para que los cambios apliquen, ajústalos en el editor de ElevenLabs y vuelve a publicar.",
+    "Voice & language stack":"Voz e idiomas","Primary voice":"Voz principal",
+    "Jessica – Playful, Bright, Warm":"Jessica – Alegre, brillante y cálida","Voice ID":"ID de voz",
+    "Accent":"Acento","American (for expats)":"Americano (para expatriados)",
+    "Default language":"Idioma predeterminado","English":"Inglés","Secondary":"Secundario",
+    "Spanish (Mexican)":"Español (mexicano)","Interruptible":"Interrumpible","On":"Activado",
+    "Knowledge surfaced in prompt":"Conocimiento incluido en el prompt","Company facts":"Datos de la empresa",
+    "Hours":"Horarios","8 services":"8 servicios","7 price points":"7 precios","Warranty":"Garantía","Payment":"Pago",
+    "Service area (8 colonias)":"Zona de servicio (8 colonias)","Appointment slots":"Horarios de cita",
+    "Guided intake — minimum 5 questions before transfer":"Recepción guiada — mínimo 5 preguntas antes de transferir",
+    "Language preference":"Preferencia de idioma","Name":"Nombre","Location / colonia":"Ubicación / colonia",
+    "Problem description":"Descripción del problema","Clarifying follow-up":"Pregunta aclaratoria",
+    "One specific question based on the answer — e.g. \"Is the leak dripping or actively running?\"":"Una pregunta específica según la respuesta — ej. \"¿La fuga gotea o corre sin parar?\"",
+    "Urgency check":"Verificación de urgencia","Offer: schedule or transfer to a human":"Oferta: agendar o transferir con un humano",
+    "Only unlocks after the 6 steps above. \"I can schedule a technician, or transfer you to one of our plumbers — which works better?\"":"Solo se desbloquea tras los 6 pasos anteriores. \"Puedo agendar un técnico o transferirlo con uno de nuestros plomeros — ¿qué prefiere?\"",
+    "Emergency override":"Anulación por emergencia","Active flooding / burst pipe / sewage":"Inundación activa / tubería rota / drenaje",
+    "Skips the flow, grabs the address immediately, dispatches, then offers transfer.":"Salta el flujo, toma la dirección de inmediato, despacha y luego ofrece transferencia.",
+    "Gas smell":"Olor a gas",
+    "Redirects to gas provider (Gas Natural Fenosa / Gas LP), tells caller to ventilate, then offers a pipe-connection check afterward.":"Redirige al proveedor de gas (Gas Natural Fenosa / Gas LP), pide ventilar y luego ofrece revisar las conexiones.",
+    "ask":"pregunta","gate":"filtro","skip":"salta","redirect":"redirige",
+    "Services":"Servicios","Emergency plumbing":"Plomería de emergencia","Drain cleaning":"Destape de drenajes",
+    "Water heater install/repair":"Instalación/reparación de boiler","Leak detection":"Detección de fugas",
+    "Toilet repair/replace":"Reparación/cambio de WC","Fixture installation":"Instalación de muebles",
+    "Sewer line inspection":"Inspección de albañal","Bath/kitchen rough-in":"Instalación hidrosanitaria",
+    "Service area":"Zona de servicio","Mon – Fri":"Lun – Vie","Saturday":"Sábado","Sunday":"Domingo",
+    "Closed · emergencies 24/7":"Cerrado · urgencias 24/7","After-hours surcharge":"Cargo fuera de horario",
+    "Cash":"Efectivo","Kueski Pay (6mo 0%)":"Kueski Pay (6 meses 0%)","Labor":"Mano de obra","30 days":"30 días",
+    "Parts":"Refacciones","90 days":"90 días","Pricing (demo estimates · MXN)":"Precios (estimados demo · MXN)",
+    "Service":"Servicio","Estimate":"Estimado","Notes":"Notas","Diagnostic visit":"Visita de diagnóstico",
+    "Credited toward service":"Se descuenta del servicio","Labor (per hour)":"Mano de obra (por hora)",
+    "Standard hours":"Horario normal","After-hours premium":"Recargo fuera de horario","Drain cleaning":"Destape de drenajes",
+    "Depends on access":"Según el acceso","Water heater install":"Instalación de boiler","Labor only":"Solo mano de obra",
+    "Non-invasive equipment":"Equipo no invasivo","Toilet repair / wax ring":"Reparación de WC / empaque",
+    "Parts + labor":"Refacciones + mano de obra",
+    "Live voice — talk to Jessica right now":"Voz en vivo — habla con Jessica ahora",
+    "Click the button below to open the ElevenLabs voice page and talk to Jessica live, in English or Spanish.":"Haz clic en el botón de abajo para abrir la página de voz de ElevenLabs y hablar con Jessica en vivo, en inglés o español.",
+    "Call Jessica for real.":"Llama a Jessica de verdad.",
+    "Opens the ElevenLabs voice page, allow the mic, and talk in English or Spanish. Works on any device.":"Abre la página de voz de ElevenLabs, permite el micrófono y habla en inglés o español. Funciona en cualquier dispositivo.",
+    "📞 Call Jessica now ↗":"📞 Llamar a Jessica ahora ↗",
+    "Simulated call — click to walk Jessica's flow (no minutes used)":"Llamada simulada — recorre el flujo de Jessica (sin gastar minutos)",
+    "This is a scripted demo of the conversation logic for when you want to show the flow without a live call.":"Es una demo guionada de la lógica de conversación para mostrar el flujo sin una llamada real.",
+    "TuberMex Plomería · intake":"TuberMex Plomería · recepción","↺ Restart call":"↺ Reiniciar llamada",
+    "Deployment channels":"Canales de despliegue","Phone (Twilio)":"Teléfono (Twilio)","Connected":"Conectado",
+    "US number routed through ElevenLabs. Assign under Deploy → Phone Numbers.":"Número de EE. UU. enrutado por ElevenLabs. Asignar en Deploy → Phone Numbers.",
+    "Web widget":"Widget web","Available":"Disponible",
+    "Embeddable call button for tubermex.com.mx.":"Botón de llamada integrable para tubermex.com.mx.",
+    "Optional":"Opcional","Can be linked to 55 4321 0987 for chat intake.":"Se puede conectar al 55 4321 0987 para recepción por chat.",
+    "Suggested next options":"Siguientes opciones sugeridas","Real human transfer":"Transferencia a humano real",
+    "Wire a transfer tool to a real plumber number so the handoff actually connects, not just spoken.":"Conecta una herramienta de transferencia a un número real de plomero para que el pase de llamada realmente conecte, no solo se diga.",
+    "Data capture":"Captura de datos",
+    "Add a webhook/tool to log name, colonia, problem, and urgency to Airtable or a CRM after each call.":"Agrega un webhook o herramienta para guardar nombre, colonia, problema y urgencia en Airtable o un CRM tras cada llamada.",
+    "Knowledge base":"Base de conocimiento",
+    "Move pricing into a KB doc so quotes can't drift and the prompt stays lean.":"Mueve los precios a un documento de base de conocimiento para que las cotizaciones no varíen y el prompt quede ligero.",
+    "Callback number":"Número de devolución",
+    "Add a 6th intake question for a callback number in case the call drops.":"Agrega una sexta pregunta para un número de devolución por si se corta la llamada.",
+    "TuberMex Plomería is a fictive demo brand. All data, pricing, and contact details are illustrative. Agent built on ElevenLabs Agents.":"TuberMex Plomería es una marca demo ficticia. Todos los datos, precios y contactos son ilustrativos. Agente creado con ElevenLabs Agents."
+  };
+  function collectNodes(){
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+      if(!n.nodeValue.trim())return NodeFilter.FILTER_REJECT;
+      var p=n.parentElement;
+      if(!p||p.closest('script,style,#chat,#quick,.langtoggle,#xlBtn,#thBtn'))return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }});
+    var out=[],n; while(n=w.nextNode())out.push(n); return out;
+  }
+  function setPageLang(l){
+    if(l===pageLang)return;
+    if(l==='es'){
+      collectNodes().forEach(function(n){
+        var key=n.nodeValue.trim();
+        if(I18N[key]){ if(!origText.has(n))origText.set(n,n.nodeValue);
+          n.nodeValue=n.nodeValue.replace(key,I18N[key]); }
+      });
+    } else {
+      origText.forEach(function(v,n){n.nodeValue=v;}); origText.clear();
+    }
+    pageLang=l;
+    document.getElementById('xlBtn').textContent = l==='es' ? '🌐 English' : '🌐 Español';
+    document.documentElement.lang = l;
+  }
 </script>
 </body>
 </html>
